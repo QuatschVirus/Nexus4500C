@@ -1,0 +1,149 @@
+[gd_scene load_steps=6 format=3 uid="uid://1yfrdmd3x2yo"]
+
+[ext_resource type="Theme" uid="uid://b562ln1okghpo" path="res://theme.tres" id="1_nki8r"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_8hf2j"]
+content_margin_left = 10.0
+content_margin_top = 10.0
+content_margin_right = 10.0
+content_margin_bottom = 10.0
+bg_color = Color(0.0784314, 0.0784314, 0.0784314, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_4botl"]
+content_margin_left = 5.0
+content_margin_top = 5.0
+content_margin_right = 5.0
+content_margin_bottom = 5.0
+bg_color = Color(0.121569, 0.121569, 0.121569, 1)
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_6qshb"]
+content_margin_left = 10.0
+content_margin_top = 5.0
+content_margin_right = 5.0
+content_margin_bottom = 5.0
+
+[sub_resource type="GDScript" id="GDScript_i8ppj"]
+resource_name = "ShowHideCompleted"
+script/source = "extends Button
+
+var text_open = \"<\"
+var text_closed = \">\"
+
+func _on_pressed():
+	get_node(\"../Completed\").visible = !get_node(\"../Completed\").visible
+	if get_node(\"../Completed\").visible:
+		text = text_open
+	else:
+		text = text_closed
+"
+
+[node name="Control" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Background" type="PanelContainer" parent="."]
+layout_mode = 0
+offset_right = 1920.0
+offset_bottom = 1080.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_8hf2j")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Background"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Background/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="TabBar" type="TabBar" parent="Background/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 0
+theme = ExtResource("1_nki8r")
+tab_count = 3
+tab_0/title = "Job Manager"
+tab_1/title = "Network Manager"
+tab_2/title = "Shop"
+
+[node name="JobManager" type="PanelContainer" parent="Background/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_4botl")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Background/HBoxContainer/VBoxContainer/JobManager"]
+layout_mode = 2
+
+[node name="Inbox" type="PanelContainer" parent="Background/HBoxContainer/VBoxContainer/JobManager/HBoxContainer"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Background/HBoxContainer/VBoxContainer/JobManager/HBoxContainer/Inbox"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Background/HBoxContainer/VBoxContainer/JobManager/HBoxContainer/Inbox/VBoxContainer"]
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxEmpty_6qshb")
+text = "Inbox"
+
+[node name="ItemList" type="ItemList" parent="Background/HBoxContainer/VBoxContainer/JobManager/HBoxContainer/Inbox/VBoxContainer"]
+layout_mode = 2
+
+[node name="Pending" type="PanelContainer" parent="Background/HBoxContainer/VBoxContainer/JobManager/HBoxContainer"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Background/HBoxContainer/VBoxContainer/JobManager/HBoxContainer/Pending"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Background/HBoxContainer/VBoxContainer/JobManager/HBoxContainer/Pending/VBoxContainer"]
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxEmpty_6qshb")
+text = "Pending
+"
+
+[node name="ItemList" type="ItemList" parent="Background/HBoxContainer/VBoxContainer/JobManager/HBoxContainer/Pending/VBoxContainer"]
+layout_mode = 2
+
+[node name="Button" type="Button" parent="Background/HBoxContainer/VBoxContainer/JobManager/HBoxContainer"]
+layout_mode = 2
+text = ">"
+script = SubResource("GDScript_i8ppj")
+
+[node name="Completed" type="PanelContainer" parent="Background/HBoxContainer/VBoxContainer/JobManager/HBoxContainer"]
+visible = false
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Background/HBoxContainer/VBoxContainer/JobManager/HBoxContainer/Completed"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Background/HBoxContainer/VBoxContainer/JobManager/HBoxContainer/Completed/VBoxContainer"]
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxEmpty_6qshb")
+text = "Completed"
+
+[node name="ItemList" type="ItemList" parent="Background/HBoxContainer/VBoxContainer/JobManager/HBoxContainer/Completed/VBoxContainer"]
+layout_mode = 2
+
+[node name="Job" type="PanelContainer" parent="Background/HBoxContainer/VBoxContainer/JobManager/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Background/HBoxContainer/VBoxContainer/JobManager/HBoxContainer/Job"]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="Background/HBoxContainer/VBoxContainer/JobManager/HBoxContainer/Job/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 30
+
+[node name="Text" type="RichTextLabel" parent="Background/HBoxContainer/VBoxContainer/JobManager/HBoxContainer/Job/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Reward" type="Label" parent="Background/HBoxContainer/VBoxContainer/JobManager/HBoxContainer/Job/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+
+[connection signal="pressed" from="Background/HBoxContainer/VBoxContainer/JobManager/HBoxContainer/Button" to="Background/HBoxContainer/VBoxContainer/JobManager/HBoxContainer/Button" method="_on_pressed"]
