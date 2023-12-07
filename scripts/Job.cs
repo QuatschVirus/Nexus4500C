@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using ComputeNodes;
 using System.Data;
 using System.Data.Common;
 using System.Runtime.CompilerServices;
@@ -27,7 +28,7 @@ namespace Job
 
         protected dynamic luaCode;
 
-        protected readonly PaymentPlan plan;
+        protected readonly Payment[] plan;
 
         public void Accept()
         {
@@ -52,6 +53,11 @@ namespace Job
         {
             luaCode.init();
         }
+
+        public Job(string title, string provider, string description, )
+        {
+            this.Title = title;
+        }
     }
 
     public enum JobStatus
@@ -64,22 +70,33 @@ namespace Job
         Contract
     }
 
-    public abstract class JobCondition
+    public class JobCondition
     {
         protected Job parent;
+        protected readonly Func<Job, string> stringify;
 
-        public override abstract string ToString();
+        protected readonly Predicate<Job> evalutator;
 
-        public abstract bool Evaluate();
+        public override string ToString()
+        {
+            return stringify(parent);
+        }
+
+        public bool Evaluate()
+        {
+            return evalutator(parent);
+        }
+
+
     }
 
     public readonly struct Reward
     {
         readonly int money;
-        readonly int nodes;
+        readonly ComputeNode[] nodes;
     }
 
-    public class PaymentPlan
+    public class Payment
     {
         [Flags]
         public enum PlanType
@@ -97,7 +114,7 @@ namespace Job
             /// <summary>
             /// When the conditions are met, give the payout once. Does not end the job
             /// </summary>
-            AtCertainPoint = 0b1 << 2,
+            AtCertainPointOnce = 0b1 << 2,
 
             /// <summary>
             /// Recieved when the job is canceled. Can have conditions. Suggestion: Specifiy multiple to have different levels of payout depending on how much work was done
@@ -105,9 +122,14 @@ namespace Job
             Cancel = 0b1 << 3,
 
             /// <summary>
-            /// Run at the end of every payment cycle, usually one month. Resets the result counters, essentially restarting the job per month. Increments <see cref="Job.Iteration"/>
+            /// Run at the end of every payment cycle, usually one month. Increments <see cref="Job.Iteration"/>
             /// </summary>
             PaymentCycle = 0b1 << 4,
+
+            /// <summary>
+            /// Every time the conditions are met, the pay is given. Can run more than once.
+            /// </summary>
+            AtCertainPoint = 0b1 << 5,
 
 
             Conditionless = Upfront
@@ -121,6 +143,26 @@ namespace Job
             PerResult = 0b_1111_1111,
             PerCorrectResult = 0b_1111_1111,
             BlackBox = 0b_1111_1111
+        }
+
+        protected Job parent;
+        protected Job mirror; // Mirrors the parent job, put can be reset to store the values relevant for the payment (i.e. state at the last payment for cycled payments)
+
+        protected PlanType plan;
+        protected PayType payType;
+        protected Reward reward;
+
+        public Payment(PlanType plan, PayType payType, Reward reward)
+        {
+            this.plan = plan;
+            this.payType = payType;
+            this.reward = reward;
+        }
+
+        public void Assign(Job parent)
+        {
+            this.parent = parent;
+            this.mirror = parent;
         }
     }
 }
